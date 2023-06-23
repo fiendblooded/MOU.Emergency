@@ -7,6 +7,7 @@
 <script setup>
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { io } from "socket.io-client";
 </script>
 <script>
 // const mapboxgl = require("mapbox-gl");
@@ -59,6 +60,30 @@ export default {
       // Add markers to the map.
       new mapboxgl.Marker(el).setLngLat(marker.geometry.coordinates).addTo(map);
     }
+
+    const socket = io('http://martinusius.sk:1337');
+
+    function getLocation(callback) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(callback);
+      } else {
+        console.log("Geolocation is not supported by this browser.");
+      }
+    }
+
+    socket.on('connect', () => {
+      getLocation((position) => {
+        socket.emit("emergency", [position.coords.latitude, position.coords.longitude]);
+      });
+    });
+
+    socket.on('no-doctors', () => {
+      alert('No doctors available');
+    });
+
+   
+
+    
   },
 };
 </script>
