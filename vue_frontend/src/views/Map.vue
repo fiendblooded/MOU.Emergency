@@ -80,8 +80,14 @@ export default {
     overlay2: false,
   }),
   methods: {
-    forMyself() {},
-    forSomeoneElse() {},
+    forMyself() {
+      // Code
+    },
+
+    forSomeoneElse() {
+      //Code
+    },
+
     cancelEmergency() {
       this.$router.push("/");
     },
@@ -113,13 +119,14 @@ export default {
 
     socket.on("connect", () => {
       getLocation((position) => {
+        // Create the "self" marker
         const geojson = {
           type: "FeatureCollection",
 
           features: [
             {
               type: "Feature",
-              properties: { message: "Foo", iconSize: [60, 60] },
+              properties: { message: "Foo" },
               geometry: {
                 type: "Point",
                 coordinates: [
@@ -141,12 +148,9 @@ export default {
             pulse.style.animationDelay = i * 0.6 + "s";
             el.appendChild(pulse);
           }
-          // const width = marker.properties.iconSize[0];
-          // const height = marker.properties.iconSize[1];
+
           el.className = "marker";
-          // el.style.backgroundImage = `url(https://placekitten.com/g/${width}/${height}/)`;
-          // el.style.width = `${width}px`;
-          // el.style.height = `${height}px`;
+
           el.style.backgroundSize = "100%";
 
           // Add markers to the map.
