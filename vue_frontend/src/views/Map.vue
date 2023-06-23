@@ -70,7 +70,7 @@ export default {
 
 .btn {
   position: fixed;
-  bottom: 4rem;
+  bottom: 6.4rem;
   left: 50%;
   transform: translateX(-50%);
   width: 75%;
