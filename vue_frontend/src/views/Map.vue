@@ -9,15 +9,12 @@
     rounded="xl"
     >Zrušiť volanie</v-btn
   >
-
-  <v-overlay v-model="overlay"></v-overlay>
 </template>
 <script setup>
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { io } from "socket.io-client";
 </script>
-
 <script>
 // const mapboxgl = require("mapbox-gl");
 // import mapboxgl from "mapbox-gl"; // or "const mapboxgl = require('mapbox-gl');"
@@ -26,7 +23,6 @@ let location = [27.131651288219417, 48.1520380051274];
 
 export default {
   name: "Map",
-
   mounted() {
     mapboxgl.accessToken =
       "pk.eyJ1IjoiZmlsaXBzaXBvcyIsImEiOiJjbGo4b2VxdXMxN3VzM2VxenlqbDhyZG14In0.tEoQDyIZe6DeE02GszDilw";
@@ -114,8 +110,8 @@ export default {
 }
 
 .btna {
-  position: absolute;
-  bottom: 6.4rem;
+  position: absolute !important;
+  bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
   width: 75%;
