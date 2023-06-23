@@ -2,13 +2,65 @@
   <div id="map"></div>
 
   <v-btn
-    @click="this.$router.push('/')"
+    @click="overlay2 = !overlay2"
     color="error"
     class="btna"
     size="x-large"
     rounded="xl"
     >Zrušiť volanie</v-btn
   >
+
+  <v-overlay class="align-center justify-center" v-model="overlay2">
+    <v-card class="pa-3 rounded-lg">
+      <v-card-title class="text-h6 mb-6">
+        Naozaj chcete zrušiť volanie?
+      </v-card-title>
+      <v-card-actions class="align-center justify-center flex-column">
+        <v-btn
+          block
+          variant="flat"
+          color="error"
+          size="large"
+          @click="cancelEmergency"
+          class="mb-3 confirmbutton rounded-lg"
+          >Zrušiť volanie</v-btn
+        >
+        <v-btn
+          block
+          class="confirmbutton rounded-lg"
+          variant="tonal"
+          size="large"
+          @click="continueEmergency"
+          >Pokračovať vo volaní</v-btn
+        >
+      </v-card-actions>
+    </v-card>
+  </v-overlay>
+
+  <v-overlay class="align-center justify-center" v-model="overlay1">
+    <v-card class="pa-3 rounded-lg">
+      <v-card-title class="text-h6 mb-6"> Pre koho voláte pomoc? </v-card-title>
+      <v-card-actions class="align-center justify-center flex-column">
+        <v-btn
+          block
+          variant="flat"
+          color="error"
+          size="large"
+          @click="forMyself"
+          class="mb-3 confirmbutton rounded-lg"
+          >Seba</v-btn
+        >
+        <v-btn
+          block
+          class="confirmbutton rounded-lg"
+          variant="tonal"
+          size="large"
+          @click="forSomeoneElse"
+          >Niekoho iného</v-btn
+        >
+      </v-card-actions>
+    </v-card>
+  </v-overlay>
 </template>
 <script setup>
 import mapboxgl from "mapbox-gl";
@@ -23,6 +75,20 @@ let location = [27.131651288219417, 48.1520380051274];
 
 export default {
   name: "Map",
+  data: () => ({
+    overlay1: true,
+    overlay2: false,
+  }),
+  methods: {
+    forMyself() {},
+    forSomeoneElse() {},
+    cancelEmergency() {
+      this.$router.push("/");
+    },
+    continueEmergency() {
+      this.overlay2 = !this.overlay2;
+    },
+  },
   mounted() {
     mapboxgl.accessToken =
       "pk.eyJ1IjoiZmlsaXBzaXBvcyIsImEiOiJjbGo4b2VxdXMxN3VzM2VxenlqbDhyZG14In0.tEoQDyIZe6DeE02GszDilw";
@@ -116,6 +182,10 @@ export default {
   transform: translateX(-50%);
   width: 75%;
   font-weight: 400;
+  text-transform: none !important;
+}
+
+.confirmbutton {
   text-transform: none !important;
 }
 
