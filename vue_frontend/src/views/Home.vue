@@ -27,7 +27,12 @@
     <v-list-item> O aplikácii </v-list-item>
     <v-list-item class="logout mb-10"> Odhlásiť sa</v-list-item>
     <div class="center">
-      <v-btn @click="" color="error" class="btn" size="x-large" rounded="xl"
+      <v-btn
+        @click="this.$router.push('/map')"
+        color="error"
+        class="btn"
+        size="x-large"
+        rounded="xl"
         >Privolať pomoc</v-btn
       >
     </div>
