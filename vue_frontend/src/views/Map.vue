@@ -13,18 +13,7 @@ import { io } from "socket.io-client";
 // const mapboxgl = require("mapbox-gl");
 // import mapboxgl from "mapbox-gl"; // or "const mapboxgl = require('mapbox-gl');"
 
-let location = [17.131651288219417, 48.1520380051274];
-const geojson = {
-  type: "FeatureCollection",
-
-  features: [
-    {
-      type: "Feature",
-      properties: { message: "Foo", iconSize: [60, 60] },
-      geometry: { type: "Point", coordinates: location },
-    },
-  ],
-};
+let location = [27.131651288219417, 48.1520380051274];
 
 export default {
   name: "Map",
@@ -39,27 +28,7 @@ export default {
     });
     map.scrollZoom.disable();
     //Add markers to the map
-    for (const marker of geojson.features) {
-      const el = document.createElement("div");
-      for (let i = 0; i < 3; i++) {
-        let pulse = document.createElement("div");
-        pulse.className = "pulse";
-
-        pulse.classList.add(`pulse-${i}`);
-        pulse.style.animationDelay = i * 0.6 + "s";
-        el.appendChild(pulse);
-      }
-      const width = marker.properties.iconSize[0];
-      const height = marker.properties.iconSize[1];
-      el.className = "marker";
-      // el.style.backgroundImage = `url(https://placekitten.com/g/${width}/${height}/)`;
-      // el.style.width = `${width}px`;
-      // el.style.height = `${height}px`;
-      el.style.backgroundSize = "100%";
-
-      // Add markers to the map.
-      new mapboxgl.Marker(el).setLngLat(marker.geometry.coordinates).addTo(map);
-    }
+    
 
     const socket = io('http://martinusius.sk:1337');
 
@@ -73,7 +42,46 @@ export default {
 
     socket.on('connect', () => {
       getLocation((position) => {
-        socket.emit("emergency", [position.coords.latitude, position.coords.longitude]);
+        const geojson = {
+          type: "FeatureCollection",
+
+          features: [
+            {
+              type: "Feature",
+              properties: { message: "Foo", iconSize: [60, 60] },
+              geometry: { type: "Point", coordinates: [position.coords.longitude, position.coords.latitude] },
+            },
+          ],
+        };
+
+
+        for (const marker of geojson.features) {
+          const el = document.createElement("div");
+          for (let i = 0; i < 3; i++) {
+            let pulse = document.createElement("div");
+            pulse.className = "pulse";
+
+            pulse.classList.add(`pulse-${i}`);
+            pulse.style.animationDelay = i * 0.6 + "s";
+            el.appendChild(pulse);
+          }
+          // const width = marker.properties.iconSize[0];
+          // const height = marker.properties.iconSize[1];
+          el.className = "marker";
+          // el.style.backgroundImage = `url(https://placekitten.com/g/${width}/${height}/)`;
+          // el.style.width = `${width}px`;
+          // el.style.height = `${height}px`;
+          el.style.backgroundSize = "100%";
+
+          // Add markers to the map.
+          new mapboxgl.Marker(el).setLngLat(marker.geometry.coordinates).addTo(map);
+        }
+
+        map.flyTo({
+          center: geojson.features[0].geometry.coordinates
+        });
+
+        socket.emit("emergency", location.reverse());
       });
     });
 
