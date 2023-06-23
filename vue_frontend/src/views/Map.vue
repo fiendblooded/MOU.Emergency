@@ -1,26 +1,36 @@
 <template>
   <div id="map"></div>
-  <v-btn color="error" class="btn" size="x-large" rounded="xl"
+
+  <v-btn
+    @click="this.$router.push('/')"
+    color="error"
+    class="btna"
+    size="x-large"
+    rounded="xl"
     >Zrušiť volanie</v-btn
   >
+
+  <v-overlay v-model="overlay"></v-overlay>
 </template>
 <script setup>
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { io } from "socket.io-client";
 </script>
+
 <script>
 // const mapboxgl = require("mapbox-gl");
 // import mapboxgl from "mapbox-gl"; // or "const mapboxgl = require('mapbox-gl');"
 
 let location = [17.131651288219417, 48.1520380051274];
+
 const geojson = {
   type: "FeatureCollection",
 
   features: [
     {
       type: "Feature",
-      properties: { message: "Foo", iconSize: [60, 60] },
+      properties: { message: "Foo" },
       geometry: { type: "Point", coordinates: location },
     },
   ],
@@ -28,6 +38,7 @@ const geojson = {
 
 export default {
   name: "Map",
+
   mounted() {
     mapboxgl.accessToken =
       "pk.eyJ1IjoiZmlsaXBzaXBvcyIsImEiOiJjbGo4b2VxdXMxN3VzM2VxenlqbDhyZG14In0.tEoQDyIZe6DeE02GszDilw";
@@ -49,8 +60,7 @@ export default {
         pulse.style.animationDelay = i * 0.6 + "s";
         el.appendChild(pulse);
       }
-      const width = marker.properties.iconSize[0];
-      const height = marker.properties.iconSize[1];
+
       el.className = "marker";
       // el.style.backgroundImage = `url(https://placekitten.com/g/${width}/${height}/)`;
       // el.style.width = `${width}px`;
@@ -61,7 +71,7 @@ export default {
       new mapboxgl.Marker(el).setLngLat(marker.geometry.coordinates).addTo(map);
     }
 
-    const socket = io('http://martinusius.sk:1337');
+    const socket = io("http://martinusius.sk:1337");
 
     function getLocation(callback) {
       if (navigator.geolocation) {
@@ -71,19 +81,18 @@ export default {
       }
     }
 
-    socket.on('connect', () => {
+    socket.on("connect", () => {
       getLocation((position) => {
-        socket.emit("emergency", [position.coords.latitude, position.coords.longitude]);
+        socket.emit("emergency", [
+          position.coords.latitude,
+          position.coords.longitude,
+        ]);
       });
     });
 
-    socket.on('no-doctors', () => {
-      alert('No doctors available');
+    socket.on("no-doctors", () => {
+      alert("No doctors available");
     });
-
-   
-
-    
   },
 };
 </script>
@@ -93,14 +102,14 @@ export default {
   height: calc(100% + 2rem);
 }
 
-.btn {
-  position: fixed;
+.btna {
+  position: absolute;
   bottom: 6.4rem;
   left: 50%;
   transform: translateX(-50%);
   width: 75%;
   font-weight: 400;
-  text-transform: none;
+  text-transform: none !important;
 }
 
 .marker {
