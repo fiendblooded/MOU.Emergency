@@ -1,7 +1,9 @@
 <template>
   <div id="map"></div>
 
+  <!-- ! CANCEL BUTTON -->
   <v-btn
+    v-if="!doctorArrived"
     @click="overlay2 = !overlay2"
     color="error"
     class="btna"
@@ -9,7 +11,7 @@
     rounded="xl"
     >Zrušiť volanie</v-btn
   >
-
+  <!-- ! CANCEL CONFIRM OVERLAY -->
   <v-overlay class="align-center justify-center" v-model="overlay2">
     <v-card class="pa-3 rounded-lg">
       <v-card-title class="text-h6 mb-6">
@@ -37,6 +39,7 @@
     </v-card>
   </v-overlay>
 
+  <!-- ! WHO ARE YOU CALLING TO HELP OVERLAY -->
   <v-overlay class="align-center justify-center" v-model="overlay1">
     <v-card class="pa-3 rounded-lg">
       <v-card-title class="text-h6 mb-6"> Pre koho voláte pomoc? </v-card-title>
@@ -61,6 +64,34 @@
       </v-card-actions>
     </v-card>
   </v-overlay>
+
+  <!-- ! SUCCESS!!! OVERLAY -->
+  <v-overlay class="align-center justify-center" v-model="doctorArrived">
+    <v-card class="pa-2 ma-2 rounded-lg">
+      <v-card-title class="text-h5 mb-6 text-center">
+        Pomoc dorazila</v-card-title
+      >
+      <v-card-text class="text-center justify-center align-center">
+        <v-img
+          class="ma-12"
+          src="https://cdn.icon-icons.com/icons2/2248/PNG/512/vuetify_icon_135035.png"
+          contain
+        ></v-img>
+
+        Vo vašej blízkosti sa nachádza lekárnik. Čakajte na mieste.
+      </v-card-text>
+      <v-card-actions class="align-center justify-center flex-column">
+        <v-btn
+          block
+          class="confirmbutton rounded-lg"
+          variant="tonal"
+          size="large"
+          @click="this.$router.push('/')"
+          >Späť do aplikácie MOU</v-btn
+        >
+      </v-card-actions>
+    </v-card>
+  </v-overlay>
 </template>
 <script setup>
 import mapboxgl from "mapbox-gl";
@@ -78,14 +109,19 @@ export default {
   data: () => ({
     overlay1: true,
     overlay2: false,
+
+    // SET THIS TO TRUE TO SHOW THE SUCCESS OVERLAY
+    doctorArrived: false,
   }),
   methods: {
     forMyself() {
       // Code
+      this.overlay1 = !this.overlay1;
     },
 
     forSomeoneElse() {
       //Code
+      this.overlay1 = !this.overlay1;
     },
 
     cancelEmergency() {
@@ -98,6 +134,7 @@ export default {
   mounted() {
     mapboxgl.accessToken =
       "pk.eyJ1IjoiZmlsaXBzaXBvcyIsImEiOiJjbGo4b2VxdXMxN3VzM2VxenlqbDhyZG14In0.tEoQDyIZe6DeE02GszDilw";
+
     const map = new mapboxgl.Map({
       container: "map", // container ID
       style: "mapbox://styles/mapbox/light-v10", // style URL
