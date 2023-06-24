@@ -262,7 +262,7 @@ export default {
         const start = lerp2(
           [position.coords.latitude + 0.001, position.coords.longitude], 
           emergency.location, 
-          Math.min(1, (performance.now() - startTime) / 1000 * 0.05)
+          Math.max(0, Math.min(1, (performance.now() - startTime - 1000) / 1000 * 0.05))
         );
 
         socket.emit('doctor-pursuit', emergency.id, start);
