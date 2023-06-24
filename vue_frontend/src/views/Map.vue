@@ -40,7 +40,7 @@
     </v-card>
   </v-overlay>
 
-   <!-- ! WHO ARE YOU CALLING TO HELP OVERLAY -->
+  <!-- ! WHO ARE YOU CALLING TO HELP OVERLAY -->
   <v-overlay class="align-center justify-center" v-model="overlay1">
     <v-card class="pa-3 rounded-lg">
       <v-card-title class="text-h6 mb-6"> Pre koho voláte pomoc? </v-card-title>
@@ -129,11 +129,12 @@ export default {
         console.log("Geolocation is not supported by this browser.");
       }
     },
-    setPulse([lat, lng]) {
+    setPulse([lat, lng], instant) {
       this.marker.setLngLat([lng, lat]);
 
-      this.map.flyTo({
-        center: [lng, lat]
+      this.map[instant ? 'jumpTo' : 'flyTo']({
+        center: [lng, lat],
+        zoom: 17
       });
     },
     emergency() {
@@ -215,7 +216,7 @@ export default {
     }
 
     this.getLocation((position) => {
-      this.setPulse([position.coords.latitude, position.coords.longitude]);
+      this.setPulse([position.coords.latitude, position.coords.longitude], true);
     });
   },
 };
