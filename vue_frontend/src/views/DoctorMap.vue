@@ -9,10 +9,10 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { emergency } from "@/socket";
 
 //Get this from GPS
-let start = [-123.160603, 45.396573];
+let start = [-122.66078118064226, 45.51413559638103];
 
 //Get this from server
-let targetLocation = [-123.169003, 45.495273];
+let targetLocation = [-122.679565, 45.495273];
 
 async function getRoute(end) {
   const query = await fetch(
@@ -21,6 +21,8 @@ async function getRoute(end) {
   );
 
   const json = await query.json();
+  console.log(json);
+
   const data = json.routes[0];
   const route = data.geometry.coordinates;
   return route;
@@ -83,15 +85,22 @@ export default {
     //Make the initial call
 
     map.on("click", async (event) => {
+      console.log('click');
+
       const coords = Object.keys(event.lngLat).map((key) => event.lngLat[key]);
+
+      const coordinates = await getRoute(coords);
+
       const geojson = {
         type: "Feature",
         properties: {},
         geometry: {
           type: "LineString",
-          coordinates: await getRoute(coords),
+          coordinates: coordinates,
         },
       };
+      console.log(coordinates);
+
       const end = {
         type: "FeatureCollection",
         features: [
