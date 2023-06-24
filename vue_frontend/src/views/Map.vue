@@ -152,9 +152,11 @@ export default {
 
       const id = v4();
 
+      const startTime = performance.now();
+
       const interval = () => {
         this.getLocation((position) => {
-          const latLng = [position.coords.latitude, position.coords.longitude];
+          const latLng = [position.coords.latitude - 0.0001 * (performance.now() - startTime) / 1000, position.coords.longitude];
 
           this.setPulse(latLng, true);
 

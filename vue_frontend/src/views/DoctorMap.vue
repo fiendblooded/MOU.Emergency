@@ -87,6 +87,12 @@ export default {
         });
         this.start = true;
       }
+      else {
+        this.map.flyTo({
+          center: [lng, lat],
+          zoom: 17,
+        });
+      }
 
       const point = {
         type: "FeatureCollection",
@@ -123,7 +129,7 @@ export default {
     hore() {
       document.querySelector(".overlay").classList.toggle("idemhore");
     },
-    initEndPoint([lat, lng]) {
+    setEndPoint([lat, lng]) {
       const end = {
         type: "FeatureCollection",
         features: [
@@ -207,10 +213,14 @@ export default {
     }
   },
   mounted() {
-    watch(emergency, (emergency) => {
-      if(emergency.id) return;
-
+    if(!emergency.id) {
       this.$router.push('/doctor');
+      return;
+    }
+
+    watch(emergency, (emergency) => {
+      if(emergency.location) this.setEndPoint(emergency.location);
+      if(emergency.id === null) this.$router.push('/doctor');
     });
     
 
@@ -233,7 +243,7 @@ export default {
       return [lerp(a[0], b[0], t), lerp(a[1], b[1], t)];
     }
 
-    this.initEndPoint(emergency.location);
+    this.setEndPoint(emergency.location);
 
     const startTime = performance.now();
 

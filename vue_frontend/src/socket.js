@@ -30,6 +30,8 @@ socket.on('emergency-canceled', (id) => {
 
 socket.on('emergency', (id, location, medicalData) => {
   if (rejectedEmergencies.includes(id)) return;
+  if (emergency.id && emergency.id !== id) return;
+
   emergency.id = id;
   emergency.location = location;
   emergency.medicalData = medicalData;
