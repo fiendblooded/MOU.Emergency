@@ -20,76 +20,13 @@ async function getRoute(end) {
 
   const json = await query.json();
   const data = json.routes[0];
-
   const route = data.geometry.coordinates;
-  console.log("data", data);
-
-  const geojson = {
-    type: "Feature",
-    properties: {},
-    geometry: {
-      type: "LineString",
-      coordinates: route,
-    },
-  };
-  if (mapD.getSource("route")) {
-    console.log("Route already exists on the map");
-    mapD.getSource("route").setData(geojson);
-  } else {
-    console.log("creating new route");
-    console.log(mapD);
-    mapD.addLayer({
-      id: "route",
-      type: "line",
-      source: {
-        type: "geojson",
-        data: route,
-      },
-      layout: {
-        "line-join": "round",
-        "line-cap": "round",
-      },
-      paint: {
-        "line-color": "#3887be",
-        "line-width": 5,
-        "line-opacity": 0.75,
-      },
-    });
-  }
-
-  // if (mapObj.getSource("route")) {
-  //   console.log("Route already exists on the map");
-  //   mapObj.getSource("route").setData(geojson);
-  // } else {
-  //   console.log("creating new route");
-  //   console.log(mapObj);
-  //   mapObj.addLayer({
-  //     id: "route",
-  //     type: "line",
-  //     source: {
-  //       type: "geojson",
-  //       data: geojson,
-  //     },
-  //     layout: {
-  //       "line-join": "round",
-  //       "line-cap": "round",
-  //     },
-  //     paint: {
-  //       "line-color": "#3887be",
-  //       "line-width": 5,
-  //       "line-opacity": 0.75,
-  //     },
-  //   });
-  // }
+  return route;
 }
 
 export default {
   name: "DoctorMap",
-  data() {
-    return {
-      mapD: {},
-    };
-  },
+
   mounted() {
     mapboxgl.accessToken =
       "pk.eyJ1IjoiZmlsaXBzaXBvcyIsImEiOiJjbGo4b2VxdXMxN3VzM2VxenlqbDhyZG14In0.tEoQDyIZe6DeE02GszDilw";
@@ -100,13 +37,12 @@ export default {
       center: start, // starting position [lng, lat]
       zoom: 17, // starting zoom
     });
-    this.mapD = map;
-    console.log(this.mapD);
+    console.log(map);
 
-    this.mapD.scrollZoom.disable();
+    map.scrollZoom.disable();
 
     //Call the directions API
-    this.mapD.on("load", () => {
+    map.on("load", () => {
       console.log("sme tu");
       // make an initial directions request that
       // starts and ends at the same location
@@ -142,11 +78,16 @@ export default {
 
     //Make the initial call
 
-    map.on("click", (event) => {
+    map.on("click", async (event) => {
       const coords = Object.keys(event.lngLat).map((key) => event.lngLat[key]);
-      let route = getRoute(coords).then((route) => {
-        console.log(route);
-      });
+      const geojson = {
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "LineString",
+          coordinates: await getRoute(coords),
+        },
+      };
       const end = {
         type: "FeatureCollection",
         features: [
@@ -187,6 +128,31 @@ export default {
             "circle-color": "#f30",
           },
         });
+        //! Route generation
+        if (map.getSource("route")) {
+          console.log("Route already exists on the map");
+          map.getSource("route").setData(geojson);
+        } else {
+          console.log("creating new route");
+          console.log(map);
+          map.addLayer({
+            id: "route",
+            type: "line",
+            source: {
+              type: "geojson",
+              data: geojson,
+            },
+            layout: {
+              "line-join": "round",
+              "line-cap": "round",
+            },
+            paint: {
+              "line-color": "#3887be",
+              "line-width": 5,
+              "line-opacity": 0.75,
+            },
+          });
+        }
       }
 
       // getRoute(coords, map);
