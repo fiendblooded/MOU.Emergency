@@ -219,6 +219,9 @@ export default {
       this.setPulse([position.coords.latitude, position.coords.longitude], true);
     });
   },
+  unmounted() {
+    socket.off('doctor-arrived');
+  }
 };
 </script>
 <style lang="scss">
