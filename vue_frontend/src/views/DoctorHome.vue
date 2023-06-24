@@ -1,6 +1,4 @@
 <template>
-  DoctorHome.vue
-
   <!-- ! SENDING HELP OVERLAY -->
   <v-overlay class="align-end justify-center" v-model="helpNeeded" @click:outside="onOverlay">
     <v-card class="px-4 py-3 ma-2 rounded-xl card">
@@ -34,8 +32,8 @@ import { watch } from "vue";
 export default {
   name: "DoctorHome",
   data: () => ({
-    helpNeeded: false,
-    interval: null
+    helpNeeded: true,
+    interval: null,
   }),
   methods: {
     getLocation(callback) {
@@ -61,9 +59,12 @@ export default {
 
     const interval = () => {
       this.getLocation((position) => {
-        const location = [position.coords.latitude + 0.001, position.coords.longitude];
+        const location = [
+          position.coords.latitude + 0.001,
+          position.coords.longitude,
+        ];
 
-        socket.emit("doctor-receive", location, '20 rokov praxe');
+        socket.emit("doctor-receive", location, "20 rokov praxe");
       });
     };
 
@@ -72,12 +73,12 @@ export default {
   },
   unmounted() {
     clearInterval(this.interval);
-  }
+  },
 };
 </script>
 <style lang="scss">
 .card {
-  width: 23.5rem;
+  width: 22rem;
 }
 .navigatebutton {
   text-transform: none !important;
