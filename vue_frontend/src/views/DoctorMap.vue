@@ -143,8 +143,6 @@ export default {
     }
   },
   mounted() {
-    console.log("Emergency:", JSON.parse(JSON.stringify(emergency)));
-
     if(emergency.id === null) {
       this.$router.push('/doctor');
       return;
@@ -160,8 +158,6 @@ export default {
       zoom: 17, // starting zoom
     });
 
-    //this.map.scrollZoom.disable();
-
     function lerp(a, b, t) {
       return a * (1 - t) + b * t;
     }
@@ -170,27 +166,28 @@ export default {
       return [lerp(a[0], b[0], t), lerp(a[1], b[1], t)];
     }
 
-    this.map.on("load", () => {
-      this.initEndPoint(emergency.location);
+    this.initEndPoint(emergency.location);
 
-      const startTime = performance.now();
+    const startTime = performance.now();
 
-      this.interval = setInterval(() => {
-        this.getLocation(async (position) => {
-          const start = lerp2(
-            [position.coords.latitude + 0.001, position.coords.longitude], 
-            emergency.location, 
-            Math.min(1, (performance.now() - startTime) / 1000 * 0.1)
-          );
+    const interval = () => {
+      this.getLocation(async (position) => {
+        const start = lerp2(
+          [position.coords.latitude + 0.001, position.coords.longitude], 
+          emergency.location, 
+          Math.min(1, (performance.now() - startTime) / 1000 * 0.1)
+        );
 
-          socket.emit('doctor-pursuit', emergency.id, start);
+        socket.emit('doctor-pursuit', emergency.id, start);
 
-          const coordinates = await this.getRoute(start, emergency.location);
-          this.setStartPoint(start);
-          this.displayRoute(coordinates);
-        });
-      }, 1000);
-    });
+        const coordinates = await this.getRoute(start, emergency.location);
+        this.setStartPoint(start);
+        this.displayRoute(coordinates);
+      });
+    }
+
+    this.interval = setInterval(interval, 1000);
+    interval();
 
     socket.on('patient-reached', () => {
       alert('Patient reached!');
