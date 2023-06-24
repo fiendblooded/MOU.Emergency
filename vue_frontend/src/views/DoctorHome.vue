@@ -15,7 +15,7 @@
           variant="flat"
           color="error"
           size="x-large"
-          @click="$router.push({ name: 'DoctorMap', params: { emergency } })"
+          @click="$router.push('/doctormap')"
           class="mb-3 navigatebutton rounded-lg font-weight-regular"
           >Navigovať</v-btn
         >

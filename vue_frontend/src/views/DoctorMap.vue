@@ -93,7 +93,7 @@ export default {
     };
   },
   mounted() {
-    console.log(emergency);
+    console.log('Emergency:', JSON.parse(JSON.stringify(emergency)));
 
     mapboxgl.accessToken =
       "pk.eyJ1IjoiZmlsaXBzaXBvcyIsImEiOiJjbGo4b2VxdXMxN3VzM2VxenlqbDhyZG14In0.tEoQDyIZe6DeE02GszDilw";
