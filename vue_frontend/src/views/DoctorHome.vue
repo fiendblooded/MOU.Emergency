@@ -32,7 +32,7 @@ import { watch } from "vue";
 export default {
   name: "DoctorHome",
   data: () => ({
-    helpNeeded: true,
+    helpNeeded: false,
     interval: null,
   }),
   methods: {
