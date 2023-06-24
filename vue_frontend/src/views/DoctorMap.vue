@@ -262,7 +262,7 @@ export default {
         const start = lerp2(
           [position.coords.latitude + 0.001, position.coords.longitude], 
           emergency.location, 
-          Math.min(1, (performance.now() - startTime) / 1000 * 0.1)
+          Math.min(1, (performance.now() - startTime) / 1000 * 0.05)
         );
 
         socket.emit('doctor-pursuit', emergency.id, start);
@@ -274,7 +274,7 @@ export default {
     }
 
     interval();
-    this.interval = setInterval(interval, 1000);
+    this.interval = setInterval(interval, 300);
 
     socket.on('patient-reached', () => {
       this.$router.push('/doctor');

@@ -174,11 +174,7 @@ export default {
 
       const interval = () => {
         this.getLocation((position) => {
-          const latLng = [
-            position.coords.latitude -
-              (0.0001 * (performance.now() - startTime)) / 1000,
-            position.coords.longitude,
-          ];
+          const latLng = [position.coords.latitude, position.coords.longitude];
 
           this.setPulse(latLng, true);
 
@@ -187,7 +183,8 @@ export default {
       };
 
       interval();
-      this.interval = setInterval(interval, 1000);
+      this.interval = setInterval(interval, 300);
+      
 
       socket.on("doctor-arrived", (message) => {
         if (message) console.log(message);

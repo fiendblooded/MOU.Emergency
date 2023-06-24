@@ -74,7 +74,7 @@ export default {
     };
 
     interval();
-    this.interval = setInterval(interval(), 1000);
+    this.interval = setInterval(interval(), 300);
   },
   unmounted() {
     clearInterval(this.interval);
