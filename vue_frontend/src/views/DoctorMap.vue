@@ -101,6 +101,8 @@ export default {
       };
       console.log(coordinates);
 
+
+
       const end = {
         type: "FeatureCollection",
         features: [
@@ -114,9 +116,14 @@ export default {
           },
         ],
       };
+
+
       if (map.getLayer("end")) {
+        console.log('updating point');
         map.getSource("end").setData(end);
       } else {
+        console.log('adding point');
+
         map.addLayer({
           id: "end",
           type: "circle",
@@ -141,31 +148,32 @@ export default {
             "circle-color": "#f30",
           },
         });
-        //! Route generation
-        if (map.getSource("route")) {
-          console.log("Route already exists on the map");
-          map.getSource("route").setData(geojson);
-        } else {
-          console.log("creating new route");
-          console.log(map);
-          map.addLayer({
-            id: "route",
-            type: "line",
-            source: {
-              type: "geojson",
-              data: geojson,
-            },
-            layout: {
-              "line-join": "round",
-              "line-cap": "round",
-            },
-            paint: {
-              "line-color": "#3887be",
-              "line-width": 5,
-              "line-opacity": 0.75,
-            },
-          });
-        }
+      }
+
+
+      if (map.getSource("route")) {
+        console.log("Route already exists on the map");
+        map.getSource("route").setData(geojson);
+      } else {
+        console.log("creating new route");
+        console.log(map);
+        map.addLayer({
+          id: "route",
+          type: "line",
+          source: {
+            type: "geojson",
+            data: geojson,
+          },
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#3887be",
+            "line-width": 5,
+            "line-opacity": 0.75,
+          },
+        });
       }
 
       // getRoute(coords, map);
