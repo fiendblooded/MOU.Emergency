@@ -11,6 +11,7 @@
     rounded="xl"
     >Zrušiť volanie</v-btn
   >
+
   <!-- ! CANCEL CONFIRM OVERLAY -->
   <v-overlay class="align-center justify-center" v-model="overlay2">
     <v-card class="pa-3 rounded-lg">
@@ -39,7 +40,7 @@
     </v-card>
   </v-overlay>
 
-  <!-- ! WHO ARE YOU CALLING TO HELP OVERLAY -->
+   <!-- ! WHO ARE YOU CALLING TO HELP OVERLAY -->
   <v-overlay class="align-center justify-center" v-model="overlay1">
     <v-card class="pa-3 rounded-lg">
       <v-card-title class="text-h6 mb-6"> Pre koho voláte pomoc? </v-card-title>
@@ -65,8 +66,8 @@
     </v-card>
   </v-overlay>
 
-  <!-- ! SUCCESS!!! OVERLAY -->
-  <v-overlay class="align-center justify-center" v-model="doctorArrived">
+   <!-- ! SUCCESS!!! OVERLAY -->
+   <v-overlay class="align-center justify-center" v-model="doctorArrived">
     <v-card class="pa-2 ma-2 rounded-lg">
       <v-card-title class="text-h5 mb-6 text-center">
         Pomoc dorazila</v-card-title
@@ -94,37 +95,72 @@
   </v-overlay>
 </template>
 <script setup>
+import { socket } from "@/socket";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { io } from "socket.io-client";
+
 </script>
 <script>
 // const mapboxgl = require("mapbox-gl");
 // import mapboxgl from "mapbox-gl"; // or "const mapboxgl = require('mapbox-gl');"
 
-let location = [27.131651288219417, 48.1520380051274];
+const location = [27.131651288219417, 48.1520380051274];
 
 export default {
   name: "Map",
   data: () => ({
     overlay1: true,
     overlay2: false,
-
-    // SET THIS TO TRUE TO SHOW THE SUCCESS OVERLAY
     doctorArrived: false,
+    marker: null,
+    map: null
   }),
   methods: {
     forMyself() {
-      // Code
-      this.overlay1 = !this.overlay1;
+      this.emergency();
     },
-
     forSomeoneElse() {
-      //Code
-      this.overlay1 = !this.overlay1;
+      this.emergency();
     },
+    getLocation(callback) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(callback);
+      } else {
+        console.log("Geolocation is not supported by this browser.");
+      }
+    },
+    setPulse([lat, lng]) {
+      this.marker.setLngLat([lng, lat]);
 
+      this.map.flyTo({
+        center: [lng, lat]
+      });
+    },
+    emergency() {
+      this.overlay1 = false;
+
+      this.getLocation((position) => {
+        this.setPulse([position.coords.latitude, position.coords.longitude]);
+      });
+
+      socket.emit('emergency', location, {
+        gender: 'Muž',
+        allergens: ['peľ', 'prach'],
+        chronicIllnesses: ['astma'],
+        bloodType: 'AB+',
+        vaccinations: ['COVID-19', 'chrípka'],
+        medications: ['inzulín'],
+        isDiabetic: true,
+        familyMembersChronicIllnesses: [],
+      });
+
+      socket.on('doctor-arrived', (message) => {
+        if(message) console.log(message);
+        this.doctorArrived = true;
+      });
+    },
     cancelEmergency() {
+      socket.emit('cancel-emergency');
       this.$router.push("/");
     },
     continueEmergency() {
@@ -134,78 +170,52 @@ export default {
   mounted() {
     mapboxgl.accessToken =
       "pk.eyJ1IjoiZmlsaXBzaXBvcyIsImEiOiJjbGo4b2VxdXMxN3VzM2VxenlqbDhyZG14In0.tEoQDyIZe6DeE02GszDilw";
-
-    const map = new mapboxgl.Map({
+    this.map = new mapboxgl.Map({
       container: "map", // container ID
       style: "mapbox://styles/mapbox/light-v10", // style URL
       center: location, // starting position [lng, lat]
       zoom: 17, // starting zoom
     });
-    map.scrollZoom.disable();
+    this.map.scrollZoom.disable();
     //Add markers to the map
 
-    const socket = io("http://martinusius.sk:1337");
+    const geojson = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: { message: "Foo", iconSize: [60, 60] },
+          geometry: {
+            type: "Point",
+            coordinates: [27.131651288219417, 48.1520380051274],
+          },
+        },
+      ],
+    };
 
-    function getLocation(callback) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(callback);
-      } else {
-        console.log("Geolocation is not supported by this browser.");
+    for (const feature of geojson.features) {
+      const el = document.createElement("div");
+      for (let i = 0; i < 3; i++) {
+        let pulse = document.createElement("div");
+        pulse.className = "pulse";
+
+        pulse.classList.add(`pulse-${i}`);
+        pulse.style.animationDelay = i * 0.6 + "s";
+        el.appendChild(pulse);
       }
+
+      el.className = "marker";
+      el.style.backgroundSize = "100%";
+
+      console.log(feature.geometry.coordinates);
+
+      this.marker = new mapboxgl.Marker(el)
+        .setLngLat(feature.geometry.coordinates)
+        .addTo(this.map);
     }
 
-    socket.on("connect", () => {
-      getLocation((position) => {
-        // Create the "self" marker
-        const geojson = {
-          type: "FeatureCollection",
-
-          features: [
-            {
-              type: "Feature",
-              properties: { message: "Foo" },
-              geometry: {
-                type: "Point",
-                coordinates: [
-                  position.coords.longitude,
-                  position.coords.latitude,
-                ],
-              },
-            },
-          ],
-        };
-
-        for (const marker of geojson.features) {
-          const el = document.createElement("div");
-          for (let i = 0; i < 3; i++) {
-            let pulse = document.createElement("div");
-            pulse.className = "pulse";
-
-            pulse.classList.add(`pulse-${i}`);
-            pulse.style.animationDelay = i * 0.6 + "s";
-            el.appendChild(pulse);
-          }
-
-          el.className = "marker";
-
-          el.style.backgroundSize = "100%";
-
-          // Add markers to the map.
-          new mapboxgl.Marker(el)
-            .setLngLat(marker.geometry.coordinates)
-            .addTo(map);
-        }
-
-        map.flyTo({
-          center: geojson.features[0].geometry.coordinates,
-        });
-
-        socket.emit("emergency", location.reverse());
-      });
-    });
-
-    socket.on("no-doctors", () => {
-      alert("No doctors available");
+    this.getLocation((position) => {
+      this.setPulse([position.coords.latitude, position.coords.longitude]);
     });
   },
 };
