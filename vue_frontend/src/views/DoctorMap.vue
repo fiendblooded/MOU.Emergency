@@ -6,6 +6,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 </script>
 <script>
+import { watch } from "vue";
 import { emergency, socket } from "@/socket";
 
 export default {
@@ -143,10 +144,13 @@ export default {
     }
   },
   mounted() {
-    if(emergency.id === null) {
+    watch(emergency, (emergency) => {
+      if(emergency.id) return;
+
       this.$router.push('/doctor');
-      return;
-    }
+    });
+    
+
 
     mapboxgl.accessToken =
       "pk.eyJ1IjoiZmlsaXBzaXBvcyIsImEiOiJjbGo4b2VxdXMxN3VzM2VxenlqbDhyZG14In0.tEoQDyIZe6DeE02GszDilw";

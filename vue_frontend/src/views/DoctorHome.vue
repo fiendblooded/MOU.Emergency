@@ -29,12 +29,12 @@
 <script></script>
 <script>
 import { socket, emergency } from "@/socket";
+import { watch } from "vue";
 
 export default {
   name: "DoctorHome",
   data: () => ({
     helpNeeded: false,
-    emergency: null,
     interval: null
   }),
   methods: {
@@ -47,26 +47,20 @@ export default {
     },
   },
   mounted() {
+    watch(emergency, (emergency) => {
+      this.helpNeeded = !!emergency.id;
+    });
+
     this.interval = setInterval(() => {
       this.getLocation((position) => {
         const location = [position.coords.latitude + 0.001, position.coords.longitude];
-        console.log(location);
 
         socket.emit("doctor-receive", location, '20 rokov praxe');
       });
     }, 1000);
-
-    socket.on('emergency', (id, location, medicalData) => {
-      emergency.id = id;
-      emergency.location = location;
-      emergency.medicalData = medicalData;
-
-      this.helpNeeded = true;
-    });
   },
   unmounted() {
     clearInterval(this.interval);
-    socket.off('emergency');
   }
 };
 </script>

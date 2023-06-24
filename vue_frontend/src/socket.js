@@ -17,3 +17,21 @@ socket.on('doctors-notified', (count) => {
 socket.on('connect', () => {
   console.log('Connected');
 });
+
+socket.on('emergency-canceled', (id) => {
+  if (emergency.id !== id) return;
+
+  emergency.id = null;
+  emergency.location = null;
+  emergency.medicalData = null;
+});
+
+socket.on('emergency', (id, location, medicalData) => {
+  if (emergency.id) return;
+
+  console.log('emergency', id);
+
+  emergency.id = id;
+  emergency.location = location;
+  emergency.medicalData = medicalData;
+});
