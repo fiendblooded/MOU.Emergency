@@ -54,10 +54,22 @@ import { emergency, socket } from "@/socket";
 export default {
   name: "DoctorMap",
   data: () => ({
-<<<<<<< Updated upstream
     interval: null,
     map: null,
     start: false,
+    marker: null,
+    bottomsheet: true,
+    medicalInfo: [
+      { title: "Pohlavie", value: "Muž" },
+      { title: "Pohlavie", value: "Muž" },
+      { title: "Pohlavie", value: "Muž" },
+    ],
+    expansionPanels: [
+      { title: "Alergény", content: ["Penicilín", "Prachy"] },
+      { title: "lol", content: "lorem" },
+      { title: "lol", content: "lorem" },
+      { title: "lol", content: [] },
+    ],
   }),
   methods: {
     getLocation(callback) {
@@ -89,29 +101,6 @@ export default {
           },
         ],
       };
-=======
-    bottomsheet: true,
-    medicalInfo: [
-      { title: "Pohlavie", value: "Muž" },
-      { title: "Pohlavie", value: "Muž" },
-      { title: "Pohlavie", value: "Muž" },
-    ],
-    expansionPanels: [
-      { title: "Alergény", content: ["Penicilín", "Prachy"] },
-      { title: "lol", content: "lorem" },
-      { title: "lol", content: "lorem" },
-      { title: "lol", content: [] },
-    ],
-  }),
-  methods: {
-    hore() {
-      console.log("hoer");
-      document.querySelector(".overlay").classList.toggle("idemhore");
-    },
-  },
-  mounted() {
-    console.log("Emergency:", JSON.parse(JSON.stringify(emergency)));
->>>>>>> Stashed changes
 
       if(this.map.getLayer('point')) {
         this.map.getSource('point').setData(point);
@@ -131,6 +120,9 @@ export default {
         },
       });
     },
+    hore() {
+      document.querySelector(".overlay").classList.toggle("idemhore");
+    },
     initEndPoint([lat, lng]) {
       const end = {
         type: "FeatureCollection",
@@ -147,6 +139,11 @@ export default {
       };
 
       for (const element of end.features) {
+        if(this.marker) {
+          this.marker.setLngLat(element.geometry.coordinates);
+          return;
+        }
+        
         const el = document.createElement("div");
         for (let i = 0; i < 3; i++) {
           let pulse = document.createElement("div");
@@ -200,7 +197,7 @@ export default {
     },
     async getRoute(from, to) {
       const query = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/cycling/${from[1]},${from[0]};${to[1]},${to[0]}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`,
+        `https://api.mapbox.com/directions/v5/mapbox/walking/${from[1]},${from[0]};${to[1]},${to[0]}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`,
         { method: "GET" }
       );
 
@@ -256,11 +253,16 @@ export default {
       });
     }
 
-    this.interval = setInterval(interval, 1000);
     interval();
+    this.interval = setInterval(interval, 1000);
 
     socket.on('patient-reached', () => {
-      alert('Patient reached!');
+      emergency.id = null;
+      emergency.location = null;
+      emergency.medicalData = null;
+
+      alert('Patient reached!')
+
       this.$router.push('/doctor');
     });
   },

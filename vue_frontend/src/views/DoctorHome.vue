@@ -2,7 +2,7 @@
   DoctorHome.vue
 
   <!-- ! SENDING HELP OVERLAY -->
-  <v-overlay class="align-end justify-center" v-model="helpNeeded">
+  <v-overlay class="align-end justify-center" v-model="helpNeeded" @click:outside="onOverlay">
     <v-card class="px-4 py-3 ma-2 rounded-xl card">
       <v-card-title class="text-h5 mb-6 text-center font-weight-regular">
         Človek v núdzi
@@ -28,7 +28,7 @@
 <script setup></script>
 <script></script>
 <script>
-import { socket, emergency } from "@/socket";
+import { socket, emergency, rejectedEmergencies } from "@/socket";
 import { watch } from "vue";
 
 export default {
@@ -45,19 +45,30 @@ export default {
         console.log("Geolocation is not supported by this browser.");
       }
     },
+    onOverlay(value) {
+      console.log('overlay off');
+      
+      rejectedEmergencies.push(emergency.id);
+      emergency.id = null;
+      emergency.location = null;
+      emergency.doctor = null;
+    }
   },
   mounted() {
     watch(emergency, (emergency) => {
       this.helpNeeded = !!emergency.id;
     });
 
-    this.interval = setInterval(() => {
+    const interval = () => {
       this.getLocation((position) => {
         const location = [position.coords.latitude + 0.001, position.coords.longitude];
 
         socket.emit("doctor-receive", location, '20 rokov praxe');
       });
-    }, 1000);
+    };
+
+    interval();
+    this.interval = setInterval(interval(), 1000);
   },
   unmounted() {
     clearInterval(this.interval);

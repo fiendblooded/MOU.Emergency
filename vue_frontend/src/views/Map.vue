@@ -97,6 +97,7 @@
 <script setup>
 import { socket } from "@/socket";
 import mapboxgl from "mapbox-gl";
+import { v4 } from 'uuid';
 import "mapbox-gl/dist/mapbox-gl.css";
 </script>
 <script>
@@ -113,6 +114,7 @@ export default {
     doctorArrived: false,
     marker: null,
     map: null,
+    interval: null
   }),
   methods: {
     forMyself() {
@@ -148,16 +150,25 @@ export default {
     emergency(medicalData) {
       this.overlay1 = false;
 
-      this.getLocation((position) => {
-        const latLng = [position.coords.latitude, position.coords.longitude];
+      const id = v4();
 
-        this.setPulse(latLng);
+      const interval = () => {
+        this.getLocation((position) => {
+          const latLng = [position.coords.latitude, position.coords.longitude];
 
-        socket.emit("emergency", latLng, medicalData);
-      });
+          this.setPulse(latLng, true);
+
+          socket.emit("emergency", id, latLng, medicalData);
+        });
+      };
+
+      interval();
+      this.interval = setInterval(interval, 1000);
+      
 
       socket.on("doctor-arrived", (message) => {
         if (message) console.log(message);
+        clearInterval(this.interval);
         this.doctorArrived = true;
       });
     },
@@ -224,6 +235,7 @@ export default {
   },
   unmounted() {
     socket.off("doctor-arrived");
+    clearInterval(this.interval);
   },
 };
 </script>

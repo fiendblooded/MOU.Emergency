@@ -10,6 +10,8 @@ export const emergency = reactive({
   medicalData: null,
 });
 
+export const rejectedEmergencies = reactive([]);
+
 socket.on('doctors-notified', (count) => {
   console.log('Doctors notified: ', count);
 });
@@ -27,10 +29,7 @@ socket.on('emergency-canceled', (id) => {
 });
 
 socket.on('emergency', (id, location, medicalData) => {
-  if (emergency.id) return;
-
-  console.log('emergency', id);
-
+  if (rejectedEmergencies.includes(id)) return;
   emergency.id = id;
   emergency.location = location;
   emergency.medicalData = medicalData;
