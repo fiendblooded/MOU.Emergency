@@ -32,7 +32,7 @@ export default {
   name: "DoctorMap",
 
   mounted() {
-    console.log('Emergency:', JSON.parse(JSON.stringify(emergency)));
+    console.log("Emergency:", JSON.parse(JSON.stringify(emergency)));
 
     mapboxgl.accessToken =
       "pk.eyJ1IjoiZmlsaXBzaXBvcyIsImEiOiJjbGo4b2VxdXMxN3VzM2VxenlqbDhyZG14In0.tEoQDyIZe6DeE02GszDilw";
@@ -85,7 +85,7 @@ export default {
     //Make the initial call
 
     map.on("click", async (event) => {
-      console.log('click');
+      console.log("click");
 
       const coords = Object.keys(event.lngLat).map((key) => event.lngLat[key]);
 
@@ -117,30 +117,25 @@ export default {
       if (map.getLayer("end")) {
         map.getSource("end").setData(end);
       } else {
-        map.addLayer({
-          id: "end",
-          type: "circle",
-          source: {
-            type: "geojson",
-            data: {
-              type: "FeatureCollection",
-              features: [
-                {
-                  type: "Feature",
-                  properties: {},
-                  geometry: {
-                    type: "Point",
-                    coordinates: coords,
-                  },
-                },
-              ],
-            },
-          },
-          paint: {
-            "circle-radius": 10,
-            "circle-color": "#f30",
-          },
-        });
+        for (const element of end.features) {
+          const el = document.createElement("div");
+          for (let i = 0; i < 3; i++) {
+            let pulse = document.createElement("div");
+            pulse.className = "pulse";
+
+            pulse.classList.add(`pulse-${i}`);
+            pulse.style.animationDelay = i * 0.6 + "s";
+            el.appendChild(pulse);
+          }
+
+          el.className = "marker";
+          el.style.backgroundSize = "100%";
+
+          this.marker = new mapboxgl.Marker(el)
+            .setLngLat(element.geometry.coordinates)
+            .addTo(map);
+        }
+
         //! Route generation
         if (map.getSource("route")) {
           console.log("Route already exists on the map");
@@ -177,5 +172,42 @@ export default {
 #map {
   width: 100%;
   height: calc(100% + 2rem);
+}
+
+.marker {
+  display: block;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  width: 1.5rem;
+  aspect-ratio: 1;
+  background-color: #c3112b;
+  position: relative;
+  z-index: 10;
+  transform-style: preserve-3d;
+}
+
+.pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateZ(-1px) translate(-50%, -50%);
+  background-color: #c3112b;
+  aspect-ratio: 1;
+
+  border-radius: 50%;
+  animation: scaleIn 3s infinite ease;
+  image-rendering: smooth;
+}
+
+@keyframes scaleIn {
+  from {
+    width: 1.4rem;
+    opacity: 0.5;
+  }
+  to {
+    width: 20rem;
+    opacity: 0;
+  }
 }
 </style>

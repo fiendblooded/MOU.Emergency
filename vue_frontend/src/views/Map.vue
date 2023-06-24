@@ -66,8 +66,8 @@
     </v-card>
   </v-overlay>
 
-   <!-- ! SUCCESS!!! OVERLAY -->
-   <v-overlay class="align-center justify-center" v-model="doctorArrived">
+  <!-- ! SUCCESS!!! OVERLAY -->
+  <v-overlay class="align-center justify-center" v-model="doctorArrived">
     <v-card class="pa-2 ma-2 rounded-lg">
       <v-card-title class="text-h5 mb-6 text-center">
         Pomoc dorazila</v-card-title
@@ -98,7 +98,6 @@
 import { socket } from "@/socket";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-
 </script>
 <script>
 // const mapboxgl = require("mapbox-gl");
@@ -113,17 +112,17 @@ export default {
     overlay2: false,
     doctorArrived: false,
     marker: null,
-    map: null
+    map: null,
   }),
   methods: {
     forMyself() {
       this.emergency({
-        gender: 'Muž',
-        allergens: ['peľ', 'prach'],
-        chronicIllnesses: ['astma'],
-        bloodType: 'AB+',
-        vaccinations: ['COVID-19', 'chrípka'],
-        medications: ['inzulín'],
+        gender: "Muž",
+        allergens: ["peľ", "prach"],
+        chronicIllnesses: ["astma"],
+        bloodType: "AB+",
+        vaccinations: ["COVID-19", "chrípka"],
+        medications: ["inzulín"],
         isDiabetic: true,
         familyMembersChronicIllnesses: [],
       });
@@ -141,9 +140,9 @@ export default {
     setPulse([lat, lng], instant) {
       this.marker.setLngLat([lng, lat]);
 
-      this.map[instant ? 'jumpTo' : 'flyTo']({
+      this.map[instant ? "jumpTo" : "flyTo"]({
         center: [lng, lat],
-        zoom: 17
+        zoom: 17,
       });
     },
     emergency(medicalData) {
@@ -154,18 +153,16 @@ export default {
 
         this.setPulse(latLng);
 
-        socket.emit('emergency', latLng, medicalData);
+        socket.emit("emergency", latLng, medicalData);
       });
 
-      
-
-      socket.on('doctor-arrived', (message) => {
-        if(message) console.log(message);
+      socket.on("doctor-arrived", (message) => {
+        if (message) console.log(message);
         this.doctorArrived = true;
       });
     },
     cancelEmergency() {
-      socket.emit('cancel-emergency');
+      socket.emit("cancel-emergency");
       this.$router.push("/");
     },
     continueEmergency() {
@@ -189,7 +186,6 @@ export default {
       features: [
         {
           type: "Feature",
-          properties: { message: "Foo", iconSize: [60, 60] },
           geometry: {
             type: "Point",
             coordinates: [27.131651288219417, 48.1520380051274],
@@ -220,12 +216,15 @@ export default {
     }
 
     this.getLocation((position) => {
-      this.setPulse([position.coords.latitude, position.coords.longitude], true);
+      this.setPulse(
+        [position.coords.latitude, position.coords.longitude],
+        true
+      );
     });
   },
   unmounted() {
-    socket.off('doctor-arrived');
-  }
+    socket.off("doctor-arrived");
+  },
 };
 </script>
 <style lang="scss">
