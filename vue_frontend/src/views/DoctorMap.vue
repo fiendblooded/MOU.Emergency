@@ -211,7 +211,10 @@ export default {
 
     watch(emergency, (emergency) => {
       if(emergency.location) this.setEndPoint(emergency.location);
-      if(emergency.id === null) this.$router.push('/doctor');
+      if(emergency.id === null) {
+        alert('Emergency canceled');
+        this.$router.push('/doctor');
+      }
 
       if(!emergency.medicalData) return;
       const { gender, bloodType, vaccinations, medication, isDiabetic, allergens, chronicIllnesses } = emergency.medicalData;
