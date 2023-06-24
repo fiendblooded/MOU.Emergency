@@ -163,8 +163,6 @@ export default {
 
           this.setPulse(latLng, true);
 
-          console.log('send emergency');
-
           socket.emit("emergency", id, latLng, medicalData);
         });
       };

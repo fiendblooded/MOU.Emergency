@@ -211,7 +211,7 @@ export default {
 
     watch(emergency, (emergency) => {
       if(emergency.location) this.setEndPoint(emergency.location);
-      if(emergency.id === null) {
+      if(emergency.canceled && emergency.id === null) {
         alert('Emergency canceled');
         this.$router.push('/doctor');
       }
@@ -277,13 +277,13 @@ export default {
     this.interval = setInterval(interval, 1000);
 
     socket.on('patient-reached', () => {
+      this.$router.push('/doctor');
+
       emergency.id = null;
       emergency.location = null;
       emergency.medicalData = null;
 
-      alert('Patient reached!')
-
-      this.$router.push('/doctor');
+      alert('Patient reached!');
     });
   },
   unmounted() {
