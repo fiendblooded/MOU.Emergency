@@ -71,7 +71,7 @@ export default {
       }
     },
     setStartPoint([lat, lng]) {
-      if (!this.start) {
+      if(!this.start) {
         this.map.jumpTo({
           center: [lng, lat],
           zoom: 17,
@@ -140,7 +140,7 @@ export default {
           this.marker.setLngLat(element.geometry.coordinates);
           return;
         }
-
+        
         const el = document.createElement("div");
         for (let i = 0; i < 3; i++) {
           let pulse = document.createElement("div");
@@ -201,10 +201,7 @@ export default {
       const json = await query.json();
       const data = json.routes[0];
       return data.geometry.coordinates;
-    },
-    hore() {
-      document.querySelector(".overlay").classList.toggle("idemhore");
-    },
+    }
   },
   mounted() {
     if(!emergency.id) {
@@ -235,104 +232,8 @@ export default {
       if(vaccinations && vaccinations.length) this.expansionPanels.push({ title: "Očkovania", content: vaccinations });
 
     });
-  },
+    
 
-
-
-
-  initEndPoint([lat, lng]) {
-    const end = {
-      type: "FeatureCollection",
-      features: [
-        {
-          type: "Feature",
-          properties: {},
-          geometry: {
-            type: "Point",
-            coordinates: [lng, lat],
-          },
-        },
-      ],
-    };
-
-    for (const element of end.features) {
-      const el = document.createElement("div");
-      for (let i = 0; i < 3; i++) {
-        let pulse = document.createElement("div");
-        pulse.className = "pulse";
-
-        pulse.classList.add(`pulse-${i}`);
-        pulse.style.animationDelay = i * 0.6 + "s";
-        el.appendChild(pulse);
-      }
-
-      el.className = "marker";
-      el.style.backgroundSize = "100%";
-
-      this.marker = new mapboxgl.Marker(el)
-        .setLngLat(element.geometry.coordinates)
-        .addTo(this.map);
-    }
-  },
-  displayRoute(coordinates) {
-    const geojson = {
-      type: "Feature",
-      properties: {},
-      geometry: {
-        type: "LineString",
-        coordinates: coordinates,
-      },
-    };
-
-
-    if (this.map.getSource("route")) {
-      this.map.getSource("route").setData(geojson);
-    } else {
-      this.map.addLayer({
-        id: "route",
-        type: "line",
-        source: {
-          type: "geojson",
-          data: geojson,
-        },
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#3887be",
-          "line-width": 5,
-          "line-opacity": 0.75,
-        },
-      });
-    }
-
-    console.log("Emergency:", JSON.parse(JSON.stringify(emergency)));
-
-    if (this.map.getLayer("point")) {
-      this.map.getSource("point").setData(point);
-      return;
-    }
-
-    this.map.addLayer({
-      id: "point",
-      type: "circle",
-      source: {
-        type: "geojson",
-        data: point,
-      },
-      paint: {
-        "circle-radius": 10,
-        "circle-color": "#3887be",
-      },
-  }),
-
-  mounted()  {
-    watch(emergency, (emergency) => {
-      if (emergency.id) return;
-
-      this.$router.push("/doctor");
-    });
 
     mapboxgl.accessToken =
       "pk.eyJ1IjoiZmlsaXBzaXBvcyIsImEiOiJjbGo4b2VxdXMxN3VzM2VxenlqbDhyZG14In0.tEoQDyIZe6DeE02GszDilw";
@@ -359,18 +260,18 @@ export default {
     const interval = () => {
       this.getLocation(async (position) => {
         const start = lerp2(
-          [position.coords.latitude + 0.001, position.coords.longitude],
-          emergency.location,
-          Math.min(1, ((performance.now() - startTime) / 1000) * 0.1)
+          [position.coords.latitude + 0.001, position.coords.longitude], 
+          emergency.location, 
+          Math.min(1, (performance.now() - startTime) / 1000 * 0.1)
         );
 
-        socket.emit("doctor-pursuit", emergency.id, start);
+        socket.emit('doctor-pursuit', emergency.id, start);
 
         const coordinates = await this.getRoute(start, emergency.location);
         this.setStartPoint(start);
         this.displayRoute(coordinates);
       });
-    };
+    }
 
     interval();
     this.interval = setInterval(interval, 1000);
@@ -385,9 +286,8 @@ export default {
       this.$router.push('/doctor');
     });
   },
-
   unmounted() {
-    socket.off("patient-reached");
+    socket.off('patient-reached');
     clearInterval(this.interval);
   },
 };
