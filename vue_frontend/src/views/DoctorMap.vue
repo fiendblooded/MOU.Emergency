@@ -114,7 +114,9 @@ export default {
           },
         ],
       };
+
       if (map.getLayer("end")) {
+        console.log("updating point");
         map.getSource("end").setData(end);
       } else {
         for (const element of end.features) {
@@ -162,8 +164,6 @@ export default {
           });
         }
       }
-
-      // getRoute(coords, map);
     });
   },
 };
