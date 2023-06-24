@@ -15,7 +15,7 @@
           variant="flat"
           color="error"
           size="x-large"
-          @click="this.$router.push('/doctormap')"
+          @click="$router.push({ name: 'DoctorMap', params: { emergency } })"
           class="mb-3 navigatebutton rounded-lg font-weight-regular"
           >Navigovať</v-btn
         >
@@ -26,11 +26,46 @@
 <script setup></script>
 <script></script>
 <script>
+import { socket, emergency } from "@/socket";
+
 export default {
   name: "DoctorHome",
   data: () => ({
-    helpNeeded: true,
+    helpNeeded: false,
+    emergency: null,
+    interval: null
   }),
+  methods: {
+    getLocation(callback) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(callback);
+      } else {
+        console.log("Geolocation is not supported by this browser.");
+      }
+    },
+  },
+  mounted() {
+    this.interval = setInterval(() => {
+      this.getLocation((position) => {
+        const location = [position.coords.latitude, position.coords.longitude];
+        console.log(location);
+
+        socket.emit("doctor-receive", location, '20 rokov praxe');
+      });
+    }, 1000);
+
+    socket.on('emergency', (id, location, medicalData) => {
+      emergency.id = id;
+      emergency.location = location;
+      emergency.medicalData = medicalData;
+
+      this.helpNeeded = true;
+    });
+  },
+  unmounted() {
+    clearInterval(this.interval);
+    socket.off('emergency');
+  }
 };
 </script>
 <style lang="scss">
