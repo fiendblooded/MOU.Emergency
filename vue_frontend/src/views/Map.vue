@@ -41,7 +41,7 @@
   </v-overlay>
 
   <!-- ! WHO ARE YOU CALLING TO HELP OVERLAY -->
-  <v-overlay class="align-center justify-center" v-model="overlay1">
+  <v-overlay class="align-center justify-center" v-model="overlay1" @click:outside="onReject">
     <v-card class="pa-3 rounded-lg">
       <v-card-title class="text-h6 mb-6"> Pre koho voláte pomoc? </v-card-title>
       <v-card-actions class="align-center justify-center flex-column">
@@ -129,6 +129,9 @@ export default {
         familyMembersChronicIllnesses: [],
       });
     },
+    onReject() {
+      this.$router.push("/");
+    },
     forSomeoneElse() {
       this.emergency({});
     },
@@ -160,6 +163,8 @@ export default {
 
           this.setPulse(latLng, true);
 
+          console.log('send emergency');
+
           socket.emit("emergency", id, latLng, medicalData);
         });
       };
@@ -170,8 +175,8 @@ export default {
 
       socket.on("doctor-arrived", (message) => {
         if (message) console.log(message);
-        clearInterval(this.interval);
         this.doctorArrived = true;
+        clearInterval(this.interval);
       });
     },
     cancelEmergency() {

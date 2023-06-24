@@ -59,17 +59,8 @@ export default {
     start: false,
     marker: null,
     bottomsheet: true,
-    medicalInfo: [
-      { title: "Pohlavie", value: "Muž" },
-      { title: "Pohlavie", value: "Muž" },
-      { title: "Pohlavie", value: "Muž" },
-    ],
-    expansionPanels: [
-      { title: "Alergény", content: ["Penicilín", "Prachy"] },
-      { title: "lol", content: "lorem" },
-      { title: "lol", content: "lorem" },
-      { title: "lol", content: [] },
-    ],
+    medicalInfo: [],
+    expansionPanels: [],
   }),
   methods: {
     getLocation(callback) {
@@ -221,6 +212,22 @@ export default {
     watch(emergency, (emergency) => {
       if(emergency.location) this.setEndPoint(emergency.location);
       if(emergency.id === null) this.$router.push('/doctor');
+
+      if(!emergency.medicalData) return;
+      const { gender, bloodType, vaccinations, medication, isDiabetic, allergens, chronicIllnesses } = emergency.medicalData;
+
+      this.medicalInfo = [];
+      this.expansionPanels = [];
+
+      if(gender) this.medicalInfo.push({ title: "Pohlavie", value: gender });
+      if(bloodType) this.medicalInfo.push({ title: "Krvná skupina", value: bloodType });
+      if(isDiabetic) this.medicalInfo.push({ title: "Diabetik", value: isDiabetic ? "Áno" : "Nie" });
+
+      if(allergens && allergens.length) this.expansionPanels.push({ title: "Alergény", content: allergens });
+      if(medication && medication.length) this.expansionPanels.push({ title: "Lieky", content: medication });
+      if(chronicIllnesses && chronicIllnesses.length) this.expansionPanels.push({ title: "Choroby", content: chronicIllnesses });
+      if(vaccinations && vaccinations.length) this.expansionPanels.push({ title: "Očkovania", content: vaccinations });
+
     });
     
 
