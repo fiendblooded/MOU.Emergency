@@ -12,7 +12,7 @@ let start = [-123.069003, 45.395273];
 //Get this from server
 let targetLocation = [-123.169003, 45.495273];
 
-async function getRoute(end) {
+async function getRoute(end, mapObj) {
   const query = await fetch(
     `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`,
     { method: "GET" }
@@ -29,7 +29,7 @@ async function getRoute(end) {
     },
   };
 
-  map.addLayer({
+  mapObj.addLayer({
     id: "route",
     type: "line",
     source: {
@@ -65,40 +65,45 @@ export default {
 
     //Call the directions API
     map.on("load", () => {
+      console.log("sme tu");
       // make an initial directions request that
       // starts and ends at the same location
-      getRoute(start);
-
+      getRoute(start, map);
+      // console.log(map.addLayer());
       // Add starting point to the map
-      map.addLayer({
-        id: "point",
-        type: "circle",
-        source: {
-          type: "geojson",
-          data: {
-            type: "FeatureCollection",
-            features: [
-              {
-                type: "Feature",
-                properties: {},
-                geometry: {
-                  type: "Point",
-                  coordinates: start,
+      if (map.getSource("route")) {
+        map.getSource("route").setData(geojson);
+      } else {
+        map.addLayer({
+          id: "point",
+          type: "circle",
+          source: {
+            type: "geojson",
+            data: {
+              type: "FeatureCollection",
+              features: [
+                {
+                  type: "Feature",
+                  properties: {},
+                  geometry: {
+                    type: "Point",
+                    coordinates: start,
+                  },
                 },
-              },
-            ],
+              ],
+            },
           },
-        },
-        paint: {
-          "circle-radius": 10,
-          "circle-color": "#3887be",
-        },
-      });
-      // this is where the code from the next step will go
+          paint: {
+            "circle-radius": 10,
+            "circle-color": "#3887be",
+          },
+        });
+      }
     });
     // reset if already exists, make a new request if it doesn't
 
     //Make the initial call
+    getRoute([-122.677738, 45.522458], map);
   },
 };
 </script>
