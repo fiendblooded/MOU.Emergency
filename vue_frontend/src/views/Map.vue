@@ -150,10 +150,14 @@ export default {
       this.overlay1 = false;
 
       this.getLocation((position) => {
-        this.setPulse([position.coords.latitude, position.coords.longitude]);
+        const latLng = [position.coords.latitude, position.coords.longitude];
+
+        this.setPulse(latLng);
+
+        socket.emit('emergency', latLng, medicalData);
       });
 
-      socket.emit('emergency', location, medicalData);
+      
 
       socket.on('doctor-arrived', (message) => {
         if(message) console.log(message);

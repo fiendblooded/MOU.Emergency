@@ -6,6 +6,8 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 </script>
 <script>
+import { emergency } from "@/socket";
+
 //Get this from GPS
 let start = [-123.160603, 45.396573];
 
@@ -28,6 +30,8 @@ export default {
   name: "DoctorMap",
 
   mounted() {
+    console.log('Emergency:', JSON.parse(JSON.stringify(emergency)));
+
     mapboxgl.accessToken =
       "pk.eyJ1IjoiZmlsaXBzaXBvcyIsImEiOiJjbGo4b2VxdXMxN3VzM2VxenlqbDhyZG14In0.tEoQDyIZe6DeE02GszDilw";
 
