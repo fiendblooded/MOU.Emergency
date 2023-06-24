@@ -1,6 +1,11 @@
 <template>
+  <div class="backgroundimage"></div>
   <!-- ! SENDING HELP OVERLAY -->
-  <v-overlay class="align-end justify-center" v-model="helpNeeded" @click:outside="onOverlay">
+  <v-overlay
+    class="align-end justify-center"
+    v-model="helpNeeded"
+    @click:outside="onOverlay"
+  >
     <v-card class="px-4 py-3 ma-2 rounded-xl card">
       <v-card-title class="text-h5 mb-6 text-center font-weight-regular">
         Človek v núdzi
@@ -44,13 +49,13 @@ export default {
       }
     },
     onOverlay(value) {
-      console.log('overlay off');
-      
+      console.log("overlay off");
+
       rejectedEmergencies.push(emergency.id);
       emergency.id = null;
       emergency.location = null;
       emergency.doctor = null;
-    }
+    },
   },
   mounted() {
     watch(emergency, (emergency) => {
@@ -84,5 +89,12 @@ export default {
   text-transform: none !important;
   font-size: 0.8rem;
   letter-spacing: 1px !important;
+}
+
+.backgroundimage {
+  height: 100%;
+  width: 100%;
+  background-image: url("https://cdn.discordapp.com/attachments/1120062214506811456/1122154551949135984/image.png");
+  background-size: contain;
 }
 </style>
