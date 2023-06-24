@@ -117,10 +117,19 @@ export default {
   }),
   methods: {
     forMyself() {
-      this.emergency();
+      this.emergency({
+        gender: 'Muž',
+        allergens: ['peľ', 'prach'],
+        chronicIllnesses: ['astma'],
+        bloodType: 'AB+',
+        vaccinations: ['COVID-19', 'chrípka'],
+        medications: ['inzulín'],
+        isDiabetic: true,
+        familyMembersChronicIllnesses: [],
+      });
     },
     forSomeoneElse() {
-      this.emergency();
+      this.emergency({});
     },
     getLocation(callback) {
       if (navigator.geolocation) {
@@ -137,23 +146,14 @@ export default {
         zoom: 17
       });
     },
-    emergency() {
+    emergency(medicalData) {
       this.overlay1 = false;
 
       this.getLocation((position) => {
         this.setPulse([position.coords.latitude, position.coords.longitude]);
       });
 
-      socket.emit('emergency', location, {
-        gender: 'Muž',
-        allergens: ['peľ', 'prach'],
-        chronicIllnesses: ['astma'],
-        bloodType: 'AB+',
-        vaccinations: ['COVID-19', 'chrípka'],
-        medications: ['inzulín'],
-        isDiabetic: true,
-        familyMembersChronicIllnesses: [],
-      });
+      socket.emit('emergency', location, medicalData);
 
       socket.on('doctor-arrived', (message) => {
         if(message) console.log(message);
