@@ -1,4 +1,6 @@
 <template>
+  DoctorHome.vue
+
   <!-- ! SENDING HELP OVERLAY -->
   <v-overlay class="align-end justify-center" v-model="helpNeeded">
     <v-card class="px-4 py-3 ma-2 rounded-xl card">
@@ -47,7 +49,7 @@ export default {
   mounted() {
     this.interval = setInterval(() => {
       this.getLocation((position) => {
-        const location = [position.coords.latitude, position.coords.longitude];
+        const location = [position.coords.latitude + 0.001, position.coords.longitude];
         console.log(location);
 
         socket.emit("doctor-receive", location, '20 rokov praxe');
